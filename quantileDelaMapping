@@ -1,6 +1,7 @@
 from scipy.stats import uniform
 from scipy.interpolate import interp1d
 import xarray as xr
+import numpy as np
 
 def quantileInterpolate(newx, oldx, oldy):
     return interp1d(oldx, oldy, bounds_error=False,
