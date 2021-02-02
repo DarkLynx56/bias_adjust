@@ -1,8 +1,3 @@
-from scipy.stats import uniform
-from scipy.interpolate import interp1d
-import xarray as xr
-import numpy as np
-
 def quantileInterpolate(newx, oldx, oldy):
     return interp1d(oldx, oldy, bounds_error=False,
                     kind='nearest', fill_value='extrapolate')(newx)
@@ -20,7 +15,7 @@ def censorValues(_dat):
     return _dat
 
 def quantileDeltaMapping(obs_h,mod_h,mod_p = None,ratio=True):
-    """
+        """
     obs_h: xr.Dataset
         xarray dataset containing observational data in the historical period
     mod_h: xr.Dataset
@@ -74,7 +69,8 @@ def quantileDeltaMapping(obs_h,mod_h,mod_p = None,ratio=True):
                                      output_core_dims=[['time']], vectorize=True,
                                      dask='parallelized',output_dtypes=[np.float])
 
-        delta_m = np.divide(mod_p,approx_t_qmc_tmp)
+        if (ratio==True): delta_m = np.divide(mod_p,approx_t_qmc_tmp)
+        else: delta_m = np.subtract(mod_p,approx_t_qmc_tmp)
 
         corr_inter_mod_p = xr.apply_ufunc(quantileInterpolate,tau_mod_p,tau_pr,obs_h_q,
                                input_core_dims=[['time'],['quantile'],['quantile']],
@@ -82,23 +78,24 @@ def quantileDeltaMapping(obs_h,mod_h,mod_p = None,ratio=True):
                                dask='parallelized',output_dtypes=[np.float])
 
         if (ratio == True): corr_mod_p = np.multiply(corr_inter_mod_p,delta_m)
-        else: corr_mod_p = np.add(corr_inter_mod_p,delta_m)
+        else: corr_mod_p = corr_inter_mod_p+delta_m
 
         # Restore missing values in corrected projection data
         if len(mod_p.time) < len(obs_h.time): corr_mod_p = corr_mod_p.reindex({'time':mod_p_cp.time})
+            
+    else:
+        N = len(mod_h.time)
+        tau = np.linspace(start=0,stop=1,num=N)
 
-    N = len(mod_h.time)
-    tau = np.linspace(start=0,stop=1,num=N)
-    
-    obs_h_q, mod_h_q = obs_h.quantile(q=tau,dim='time'), mod_h.quantile(q=tau,dim='time')
-     
-    corr_mod_h = xr.apply_ufunc(quantileInterpolate,mod_h,mod_h_q,obs_h_q,
-                               input_core_dims=[['time'],['quantile'],['quantile']],
-                               output_core_dims=[['time']],vectorize=True,
-                               dask='parallelized',output_dtypes=[np.float])
-    
-    # Restore missing values in corrected historical data
-    if len(mod_h.time) < len(obs_h.time): corr_mod_h = corr_mod_h.reindex({'time':mod_h_cp.time})
+        obs_h_q, mod_h_q = obs_h.quantile(q=tau,dim='time'), mod_h.quantile(q=tau,dim='time')
+
+        corr_mod_h = xr.apply_ufunc(quantileInterpolate,mod_h,mod_h_q,obs_h_q,
+                                   input_core_dims=[['time'],['quantile'],['quantile']],
+                                   output_core_dims=[['time']],vectorize=True,
+                                   dask='parallelized',output_dtypes=[np.float])
+
+        # Restore missing values in corrected historical data
+        if len(mod_h.time) < len(obs_h.time): corr_mod_h = corr_mod_h.reindex({'time':mod_h_cp.time})
         
     if (mod_p is None): return corr_mod_h
-    else: return corr_mod_h, corr_mod_p
+    else: return corr_mod_p
