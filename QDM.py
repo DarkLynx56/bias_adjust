@@ -1,3 +1,8 @@
+import numpy as np
+import xarray as xr
+from scipy.interpolate import interp1d
+from scipy.stats import uniform
+
 def quantileInterpolate(newx, oldx, oldy):
     return interp1d(oldx, oldy, bounds_error=False,
                     kind='nearest', fill_value='extrapolate')(newx)
@@ -78,7 +83,7 @@ def quantileDeltaMapping(obs_h,mod_h,mod_p = None,ratio=True):
                                dask='parallelized',output_dtypes=[np.float])
 
         if (ratio == True): corr_mod_p = np.multiply(corr_inter_mod_p,delta_m)
-        else: corr_mod_p = corr_inter_mod_p+delta_m
+        else: corr_mod_p = np.add(corr_inter_mod_p,delta_m)
 
         # Restore missing values in corrected projection data
         if len(mod_p.time) < len(obs_h.time): corr_mod_p = corr_mod_p.reindex({'time':mod_p_cp.time})
