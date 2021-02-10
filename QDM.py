@@ -44,7 +44,7 @@ def quantileDeltaMapping(obs_h,mod_h,mod_p = None,ratio=True):
                           output_core_dims=[['time']], vectorize=True,
                           dask='parallelized',output_dtypes=[np.float])
     
-    if (mod_p != None):
+    if (mod_p is not None):
         mod_p_cp = mod_p.copy(deep=True)
         mod_p = mod_p.dropna(dim='time')
         mod_p = xr.apply_ufunc(censorValues,mod_p,input_core_dims=[['time']],
