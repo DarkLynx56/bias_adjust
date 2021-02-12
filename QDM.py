@@ -67,7 +67,7 @@ def quantileDeltaMapping(obs_h,mod_h,mod_p=None,ratio=True):
                                output_core_dims=[['time']],vectorize=True,
                                dask='parallelized',output_dtypes=[np.float])
 
-        corr_mod = np.multiply(corr_inter_mod_p,delta_m) if (ratio == True) else np.add(corr_inter_mod_p,delta_m)
+        corr_mod = np.multiply(corr_inter_mod_p,delta_m) if ratio else np.add(corr_inter_mod_p,delta_m)
 
         # Restore missing values in corrected projection data
         if (len(mod_p.time) < len(obs_h.time)): corr_mod = corr_mod.reindex({'time':mod_p_cp['time']})
