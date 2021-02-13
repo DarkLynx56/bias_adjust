@@ -59,9 +59,8 @@ def quantileDeltaMapping(obs_h,mod_h,mod_p=None,ratio=True):
                                      output_core_dims=[['time']], vectorize=True,
                                      dask='parallelized',output_dtypes=[np.float])
 
-        if (ratio==True): delta_m = np.divide(mod_p,approx_t_qmc_tmp)
-        else: delta_m = np.subtract(mod_p,approx_t_qmc_tmp)
-
+        delta_m = np.divide(mod_p,approx_t_qmc_tmp) if ratio else np.subtract(mod_p,approx_t_qmc_tmp)
+        
         corr_inter_mod_p = xr.apply_ufunc(quantileInterpolate,tau_mod_p,tau_var,obs_h_q,
                                input_core_dims=[['time'],['quantile'],['quantile']],
                                output_core_dims=[['time']],vectorize=True,
