@@ -1,9 +1,5 @@
 import numpy as np
 import xarray as xr
-
-def varCollect(dSet):
-    _var_keys, _coords = list(dSet.variables.keys()), list(dSet.coords)
-    return sorted(list(set(_var_keys).difference(set(_coords))))
     
 def applyMBCnR(*argv,num_iter=20,qmap_precalc=False,ratio_seq=np.array([True,False])):
     from rpy2.robjects import pandas2ri
@@ -29,7 +25,7 @@ def pyMBCn(obs_h,mod_h,mod_p,**kwargs):
     time_hist,time_proj = obs_h['time'].values, mod_p['time'].values
     obs_h,mod_h,mod_p = obs_h.drop('time'),mod_h.drop('time'),mod_p.drop('time')
 
-    datSet_list,var_list = [obs_h,mod_h,mod_p],varCollect(obs_h)
+    datSet_list,var_list = [obs_h,mod_h,mod_p],sorted(list(obs_h.keys()))
     
     datArr_list = [dat[var] for dat in datSet_list for var in var_list]
 
