@@ -1,13 +1,13 @@
 import numpy as np
 import xarray as xr
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.packages import importr
+
+pandas2ri.activate()
     
-def applyMBCnR(*argv,num_iter=20,qmap_precalc=False,ratio_seq=np.array([True,False])):
-    from rpy2.robjects import pandas2ri
-    from rpy2.robjects.packages import importr   
-    pandas2ri.activate()
+rMBC = importr("MBC")
     
-    rMBC = importr("MBC")
-    
+def applyMBCnR(*argv,num_iter=20,qmap_precalc=False,ratio_seq=np.array([True,False])):    
     datList = [arg for arg in argv]
     datArr = np.array_split(datList,3)
     
