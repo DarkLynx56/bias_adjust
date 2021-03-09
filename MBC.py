@@ -51,7 +51,7 @@ def MBCn(obs_h,mod_h,mod_p,num_iter):
             dset_h.append(xr.Dataset({var:mod_corr[k]}))
             dset_p.append(xr.Dataset({var:mod_corr[j]}))
 
-        mod_corr_h, mod_corr_p = xr.merge(dset_h).round(2).assign_coords({'time':time_hist}),xr.merge(dset_p).round(2).assign_coords({'time':time_proj})
+        mod_corr_h, mod_corr_p = xr.merge(dset_h).round(2).assign_coords({'time':time_hist}).transpose('time','latitude','longitude'),xr.merge(dset_p).round(2).assign_coords({'time':time_proj}).transpose('time','latitude','longitude')
         return mod_corr_h,mod_corr_p
     
     mbc = pyMBCn(obs_h,mod_h,mod_p,num_iter=num_iter)
