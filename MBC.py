@@ -24,21 +24,18 @@ def MBCn(obs_h,mod_h,mod_p,num_iter):
         datArr = np.array_split(datList,3)
 
         obs_h,mod_h,mod_p, var_cnt = datArr[0].T, datArr[1].T, datArr[2].T, len(datArr[0])
-
         res = rMBC.MBCn(obs_h,mod_h,mod_p,num_iter,silent=True,qmap_precalc=False,ratio_seq=np.repeat(False,var_cnt))
-
         hist,proj = [res[0][:,i] for i in np.arange(var_cnt)],[res[1][:,i] for i in np.arange(var_cnt)]
-
         dat_collect = *hist,*proj
 
         return dat_collect
+    
     ### Apply MBCn function to dataset ###
     def pyMBCn(obs_h,mod_h,mod_p,**kwargs):
         time_hist,time_proj = obs_h['time'].values, mod_p['time'].values
         obs_h,mod_h,mod_p = obs_h.drop('time'),mod_h.drop('time'),mod_p.drop('time')
 
         datSet_list,var_list = [obs_h,mod_h,mod_p],sorted(list(obs_h.keys()))
-
         datArr_list = [dat[var] for dat in datSet_list for var in var_list]
 
         time_sgn_i= [['time']]*len(datArr_list) 
