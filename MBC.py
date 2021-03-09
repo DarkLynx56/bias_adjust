@@ -1,3 +1,11 @@
+import numpy as np
+import xarray as xr
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.packages import importr
+
+pandas2ri.activate()
+rMBC = importr("MBC")
+
 def MBCn(obs_h,mod_h,mod_p,num_iter):
     import time
     start = time.time()
