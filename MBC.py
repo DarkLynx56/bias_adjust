@@ -7,13 +7,13 @@ pandas2ri.activate()
     
 rMBC = importr("MBC")
     
-def applyMBCnR(*argv,num_iter=20,qmap_precalc=False,ratio_seq=np.array([True,False])):    
+def applyMBCnR(*argv,num_iter=20,qmap_precalc=False):    
     datList = [arg for arg in argv]
     datArr = np.array_split(datList,3)
     
     obs_h,mod_h,mod_p, var_cnt = datArr[0].T, datArr[1].T, datArr[2].T, len(datArr[0])
 
-    res = rMBC.MBCn(obs_h,mod_h,mod_p,num_iter,qmap_precalc=qmap_precalc,ratio_seq=ratio_seq)
+    res = rMBC.MBCn(obs_h,mod_h,mod_p,num_iter,qmap_precalc=qmap_precalc,ratio_seq=np.repeat(False,var_cnt))
     
     hist,proj = [res[0][:,i] for i in np.arange(var_cnt)],[res[1][:,i] for i in np.arange(var_cnt)]
     
@@ -22,6 +22,9 @@ def applyMBCnR(*argv,num_iter=20,qmap_precalc=False,ratio_seq=np.array([True,Fal
     return dat_collect
 
 def pyMBCn(obs_h,mod_h,mod_p,**kwargs):
+    import time
+    start = time.time()
+    
     time_hist,time_proj = obs_h['time'].values, mod_p['time'].values
     obs_h,mod_h,mod_p = obs_h.drop('time'),mod_h.drop('time'),mod_p.drop('time')
 
@@ -40,5 +43,8 @@ def pyMBCn(obs_h,mod_h,mod_p,**kwargs):
         dset_p.append(xr.Dataset({var:mod_corr[j]}))
     
     mod_corr_h, mod_corr_p = xr.merge(dset_h).round(2).assign_coords({'time':time_hist}),xr.merge(dset_p).round(2).assign_coords({'time':time_proj})
+
+    end = time.time()
+    print("▮▮▮ Elapsed time in real time :" , time.strftime("%M",time.gmtime(end-start)),"minutes ▮▮▮")
 
     return mod_corr_h,mod_corr_p
