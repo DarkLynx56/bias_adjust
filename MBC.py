@@ -11,21 +11,7 @@ def MBCn(obs_h,mod_h,mod_p,num_iter):
     start = time.time()
     '''Calculates for the Multivate Bias Correction using N-pdft of climate model outputs from MBC package by 
     Cannon (2018) <doi:10.1007/s00382-017-3580-6>'''
-        
-    #### Inputs must have the same lengths, so check for lengths ####
-    var_list,var_count = list(obs_h.keys()),len(obs_h.keys())
-    shape = np.array(obs_h[var_list[0]].shape)
-    size = np.prod(shape)
-    print('▮▮▮ Checking if Datasets have equal lengths.....')
-    check1 = np.array_equal(np.array(obs_h[var_list[0]].shape),np.array(mod_h[var_list[0]].shape))
-    check2 = np.array_equal(np.array(obs_h[var_list[0]].shape),np.array(mod_p[var_list[0]].shape))
-    if check1 == True and check2 == True:
-        print('▮▮▮ Datasets have the same dimension lengths, continue executing script.....')
-    else:
-        print('▮▮▮ Datasets does not have the same dimension lengths, abort executing script and Sayonara!')
-        import sys 
-        sys.exit()
-        
+          
     ### Create function for MBCn ####    
     def applyMBCnR(*argv,num_iter=20):    
         datList = [arg for arg in argv]
